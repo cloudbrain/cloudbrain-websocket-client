@@ -1,0 +1,60 @@
+{
+  "name": "cloudbrain-websocket",
+  "description": "A client for connecting and subscribing to the Cloudbrain WebSocket Server",
+  "version": "1.0.0",
+  "maintainers": [
+    {
+      "name": "William Wnekowicz",
+      "email": "william.wnekowicz@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/flysonic10/cloudbrain-websocket#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flysonic10/cloudbrain-websocket.git"
+  },
+  "bugs": {
+    "url": "https://github.com/flysonic10/cloudbrain-websocket/issues"
+  },
+  "dependencies": {
+    "sockjs-client": "^1.0.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.0",
+    "babel-eslint": "^4.1.6",
+    "babel-istanbul": "^0.6.0",
+    "babel-istanbul-loader": "0.0.1",
+    "babel-loader": "^6.2.1",
+    "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^3.1.0",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.19",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
+    "karma-jasmine": "^0.3.6",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.7.0",
+    "rimraf": "^2.5.0",
+    "webpack": "^1.12.11"
+  },
+  "optionalDependencies": {},
+  "directories": {},
+  "keywords": [
+    "cloudbrain",
+    "websocket"
+  ],
+  "license": "AGPL-3.0",
+  "main": "dist/cloudbrain-websocket.js",
+  "scripts": {
+    "build": "npm run clean && npm run build:dev && npm run build:prd",
+    "build:dev": "webpack src/cloudbrain-websocket.js dist/cloudbrain-websocket.js --config tools/webpack.config.dev.js",
+    "build:prd": "webpack src/cloudbrain-websocket.js dist/cloudbrain-websocket.min.js --config tools/webpack.config.prd.js",
+    "clean": "rimraf dist build",
+    "lint": "eslint src",
+    "prepublish": "npm run build",
+    "test": "karma start --single-run --no-auto-watch karma.config.js"
+  }
+}
