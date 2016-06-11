@@ -51,6 +51,7 @@ class CloudbrainWebsocket {
 
     let deviceName = params.deviceName || this.deviceName;
     let deviceId = params.deviceId || this.deviceId;
+    let downsamplingFactor = params.downsamplingFactor || 1;
 
     if(!metric) { throw Error('Missing metric') }
     if(!deviceName || !deviceId) { throw Error('Missing device parameters') }
@@ -59,7 +60,8 @@ class CloudbrainWebsocket {
       type: 'subscription',
       deviceName: deviceName,
       deviceId: deviceId,
-      metric: metric
+      metric: metric,
+      downsamplingFactor: downsamplingFactor
     };
 
     this._createNestedObject(this.subscriptions, [config.deviceId, config.deviceName]);
