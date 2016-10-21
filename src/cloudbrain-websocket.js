@@ -1,14 +1,15 @@
 import SockJS from 'sockjs-client';
 
 class CloudbrainWebsocket {
-  constructor(connUrl, deviceName='', deviceId='') {
-    this.connUrl = connUrl;
-    this.deviceName = deviceName;
-    this.deviceId = deviceId;
+  constructor(config) {
+    this.host = config.host;
+    this.deviceName = config.deviceName;
+    this.deviceId = config.deviceId;
+    this.token = config.token;
     this.conn = null;
     this.subscriptions = {};
 
-    if (!connUrl) { throw Error('SockJS connection URL not specified'); }
+    if (!config.host) { throw Error('SockJS connection URL not specified'); }
   }
 
   disconnect = () => {
@@ -21,7 +22,7 @@ class CloudbrainWebsocket {
   connect = (onOpenCallback, onCloseCallback) => {
     this.disconnect();
 
-    this.conn = new SockJS(this.connUrl);
+    this.conn = new SockJS(this.host);
 
     this.conn.onopen = () => {
       if (onOpenCallback) {
@@ -52,6 +53,7 @@ class CloudbrainWebsocket {
     let deviceName = params.deviceName || this.deviceName;
     let deviceId = params.deviceId || this.deviceId;
     let downsamplingFactor = params.downsamplingFactor || 1;
+    let token = params.token || this.token;
 
     if(!metric) { throw Error('Missing metric') }
     if(!deviceName || !deviceId) { throw Error('Missing device parameters') }
@@ -61,6 +63,7 @@ class CloudbrainWebsocket {
       deviceName: deviceName,
       deviceId: deviceId,
       metric: metric,
+      token: token,
       downsamplingFactor: downsamplingFactor
     };
 
