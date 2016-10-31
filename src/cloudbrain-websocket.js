@@ -4,7 +4,6 @@ class CloudbrainWebsocket {
   constructor(config) {
     this.host = config.host;
     this.deviceName = config.deviceName;
-    this.deviceId = config.deviceId;
     this.token = config.token;
     this.conn = null;
     this.subscriptions = {};
@@ -51,29 +50,27 @@ class CloudbrainWebsocket {
     }
 
     let deviceName = params.deviceName || this.deviceName;
-    let deviceId = params.deviceId || this.deviceId;
     let downsamplingFactor = params.downsamplingFactor || 1;
     let token = params.token || this.token;
 
     if(!metric) { throw Error('Missing metric') }
-    if(!deviceName || !deviceId) { throw Error('Missing device parameters') }
+    if(!deviceName) { throw Error('Missing device parameters') }
 
     const config = {
       type: 'subscription',
       deviceName: deviceName,
-      deviceId: deviceId,
       metric: metric,
       token: token,
       downsamplingFactor: downsamplingFactor
     };
 
-    this._createNestedObject(this.subscriptions, [config.deviceId, config.deviceName]);
+    this._createNestedObject(this.subscriptions, [config.deviceName]);
 
-    if (this.subscriptions[config.deviceId][config.deviceName][metric]) {
-      this.subscriptions[config.deviceId][config.deviceName][metric].push(onMessageCb);
+    if (this.subscriptions[config.deviceName][metric]) {
+      this.subscriptions[config.deviceName][metric].push(onMessageCb);
     } else {
-      this.subscriptions[config.deviceId][config.deviceName][metric] = [];
-      this.subscriptions[config.deviceId][config.deviceName][metric].push(onMessageCb);
+      this.subscriptions[config.deviceName][metric] = [];
+      this.subscriptions[config.deviceName][metric].push(onMessageCb);
     }
 
     this.conn.send(JSON.stringify(config));
@@ -85,21 +82,19 @@ class CloudbrainWebsocket {
     }
 
     let deviceName = params.deviceName || this.deviceName;
-    let deviceId = params.deviceId || this.deviceId;
 
     if(!metric) { throw Error('Missing metric') }
-    if(!deviceName || !deviceId) { throw Error('Missing device parameters') }
+    if(!deviceName) { throw Error('Missing device parameters') }
 
     const config = {
       type: 'unsubscription',
       deviceName: deviceName,
-      deviceId: deviceId,
       metric: metric
     };
 
-    if (this.subscriptions[config.deviceId][config.deviceName][metric]) {
-      this.subscriptions[config.deviceId][config.deviceName][metric].splice(
-        this.subscriptions[config.deviceId][config.deviceName][metric].indexOf(onMessageCb), 1);
+    if (this.subscriptions[config.deviceName][metric]) {
+      this.subscriptions[config.deviceName][metric].splice(
+        this.subscriptions[config.deviceName][metric].indexOf(onMessageCb), 1);
     }
 
     this.conn.send(JSON.stringify(config));
@@ -108,10 +103,9 @@ class CloudbrainWebsocket {
   _onmessage = (e) => {
     let jsonContent = JSON.parse(e.data);
     let fromMetric = jsonContent.metric;
-    let fromDeviceId = jsonContent.device_id;
     let fromDeviceName = jsonContent.device_name;
 
-    this.subscriptions[fromDeviceId][fromDeviceName][fromMetric].forEach((cb) => cb(jsonContent));
+    this.subscriptions[fromDeviceName][fromMetric].forEach((cb) => cb(jsonContent));
   };
 
   _createNestedObject = function( base, names ) {
