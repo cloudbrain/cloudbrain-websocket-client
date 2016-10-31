@@ -1,7 +1,7 @@
 {
   "name": "cloudbrain-websocket",
   "description": "A client for connecting and subscribing to the Cloudbrain WebSocket Server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "maintainers": [
     {
       "name": "William Wnekowicz",
