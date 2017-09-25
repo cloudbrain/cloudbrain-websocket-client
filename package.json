@@ -12,13 +12,13 @@
       "email": "william.wnekowicz@gmail.com"
     }
   ],
-  "homepage": "https://github.com/flysonic10/cloudbrain-websocket#readme",
+  "homepage": "https://github.com/cloudbrain/cloudbrain-websocket-client#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flysonic10/cloudbrain-websocket.git"
+    "url": "git+https://github.com/cloudbrain/cloudbrain-websocket-client.git"
   },
   "bugs": {
-    "url": "https://github.com/flysonic10/cloudbrain-websocket/issues"
+    "url": "https://github.com/cloudbrain/cloudbrain-websocket-client/issues"
   },
   "dependencies": {
     "sockjs-client": "^1.0.3"
