@@ -4,6 +4,10 @@
   "version": "1.3.0",
   "maintainers": [
     {
+      "name": "Marion Le Borgne",
+      "email": "marion@ebrain.io"
+    },
+    {
       "name": "William Wnekowicz",
       "email": "william.wnekowicz@gmail.com"
     }
