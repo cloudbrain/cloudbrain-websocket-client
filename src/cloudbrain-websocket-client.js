@@ -1,6 +1,6 @@
 import SockJS from 'sockjs-client';
 
-class CloudbrainWebsocket {
+class CloudbrainWebsocketClient {
   constructor(config) {
     this.host = config.host;
     this.deviceName = config.deviceName;
@@ -115,4 +115,4 @@ class CloudbrainWebsocket {
   };
 }
 
-export default CloudbrainWebsocket;
+export default CloudbrainWebsocketClient;

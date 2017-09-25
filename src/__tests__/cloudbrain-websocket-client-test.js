@@ -1,6 +1,6 @@
-import CloudbrainWebsocket from '../cloudbrain-websocket-client';
+import CloudbrainWebsocketClient from '../cloudbrain-websocket-client';
 
-describe('CloudbrainWebsocket', () => {
+describe('CloudbrainWebsocketClient', () => {
 
   let client = {};
   let MockSockJS = () => {
@@ -16,12 +16,12 @@ describe('CloudbrainWebsocket', () => {
   let host = 'http://some.url';
 
   beforeEach(() => {
-    client = new CloudbrainWebsocket({ host: host });
+    client = new CloudbrainWebsocketClient({ host: host });
   });
 
   describe('constructor', () => {
     it('throws an error when missing parameters', () => {
-      expect(() => { new CloudbrainWebsocket({}) }).toThrowError('SockJS' +
+      expect(() => { new CloudbrainWebsocketClient({}) }).toThrowError('SockJS' +
         ' connection URL not specified');
     });
   });
@@ -116,7 +116,7 @@ describe('CloudbrainWebsocket', () => {
 
     describe('without device parameters', () => {
       beforeEach(() => {
-        client = new CloudbrainWebsocket({ host: host,
+        client = new CloudbrainWebsocketClient({ host: host,
                                            deviceName: params.deviceName });
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
@@ -174,7 +174,7 @@ describe('CloudbrainWebsocket', () => {
 
     describe('without device parameters', () => {
       beforeEach(() => {
-        client = new CloudbrainWebsocket({ host: host,
+        client = new CloudbrainWebsocketClient({ host: host,
                                            deviceName: params.deviceName });
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
