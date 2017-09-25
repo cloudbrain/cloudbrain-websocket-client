@@ -1,11 +1,5 @@
-# Cloudbrain Websocket Client [![Build Status](https://travis-ci.org/flysonic10/cloudbrain-websocket.svg?branch=master)](https://travis-ci.org/flysonic10/cloudbrain-websocket)
+# Cloudbrain Websocket Client 
 
-A client for connecting and subscribing to the Cloudbrain WebSocket Server
+[![Build Status](https://travis-ci.org/flysonic10/cloudbrain-websocket.svg?branch=master)](https://travis-ci.org/flysonic10/cloudbrain-websocket)
 
-## Usage
-
-### Instantiation
-### Connect
-### Subscribe
-### Unsubscribe
-### Disconnect
+A NodeJS client for connecting and subscribing to the Cloudbrain WebSocket Server
