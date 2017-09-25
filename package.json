@@ -1,5 +1,5 @@
 {
-  "name": "cloudbrain-websocket",
+  "name": "cloudbrain-websocket-client",
   "description": "A client for connecting and subscribing to the Cloudbrain WebSocket Server",
   "version": "1.4.0",
   "maintainers": [
@@ -52,11 +52,11 @@
     "websocket"
   ],
   "license": "AGPL-3.0",
-  "main": "dist/cloudbrain-websocket.js",
+  "main": "dist/cloudbrain-websocket-client.js",
   "scripts": {
     "build": "npm run clean && npm run build:dev && npm run build:prd",
-    "build:dev": "webpack src/cloudbrain-websocket.js dist/cloudbrain-websocket.js --config tools/webpack.config.dev.js",
-    "build:prd": "webpack src/cloudbrain-websocket.js dist/cloudbrain-websocket.min.js --config tools/webpack.config.prd.js",
+    "build:dev": "webpack src/cloudbrain-websocket-client.js dist/cloudbrain-websocket-client.js --config tools/webpack.config.dev.js",
+    "build:prd": "webpack src/cloudbrain-websocket-client.js dist/cloudbrain-websocket-client.min.js --config tools/webpack.config.prd.js",
     "clean": "rimraf dist build",
     "lint": "eslint src",
     "prepublish": "npm run build",

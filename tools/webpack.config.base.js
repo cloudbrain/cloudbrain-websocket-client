@@ -8,7 +8,7 @@ module.exports = {
   },
   output: {
     libraryTarget: 'umd',
-    library: 'cloudbrain-websocket',
+    library: 'cloudbrain-websocket-client',
   },
   resolve: {
     extensions: [
