@@ -5,7 +5,8 @@ import React from 'react';
 class CloudbrainWebsocketClient {
   constructor(config) {
     this.host = config.host;
-    this.deviceName = config.deviceName;
+    this.exchangeName = config.exchangeName;
+    this.routingKey = config.routingKey;
     this.token = config.token;
     this.conn = null;
     this.subscriptions = {};
@@ -48,65 +49,67 @@ class CloudbrainWebsocketClient {
     };
   };
 
-  subscribe = (metric, params, onMessageCb) => {
+  subscribe = (params, onMessageCb) => {
     if (Object.prototype.toString.call(params) === '[object Function]') {
       onMessageCb = params;
     }
 
-    let deviceName = params.deviceName || this.deviceName;
+    let exchangeName = params.exchangeName || this.exchangeName;
+    let routingKey = params.routingKey || this.routingKey;
     let downsamplingFactor = params.downsamplingFactor || 1;
     let token = params.token || this.token;
 
-    if (!metric) {
-      throw Error('Missing metric')
+    if (!exchangeName) {
+      throw Error('Missing exchange name')
     }
-    if (!deviceName) {
-      throw Error('Missing device parameters')
+    if (!routingKey) {
+      throw Error('Missing routing key')
     }
 
     const config = {
       type: 'subscription',
-      deviceName: deviceName,
-      metric: metric,
+      exchangeName: exchangeName,
+      routingKey: routingKey,
       token: token,
       downsamplingFactor: downsamplingFactor
     };
 
-    this._createNestedObject(this.subscriptions, [config.deviceName]);
+    this._createNestedObject(this.subscriptions, [config.exchangeName]);
 
-    if (this.subscriptions[config.deviceName][metric]) {
-      this.subscriptions[config.deviceName][metric].push(onMessageCb);
+    if (this.subscriptions[config.exchangeName][routingKey]) {
+      this.subscriptions[config.exchangeName][routingKey].push(onMessageCb);
     } else {
-      this.subscriptions[config.deviceName][metric] = [];
-      this.subscriptions[config.deviceName][metric].push(onMessageCb);
+      this.subscriptions[config.exchangeName][routingKey] = [];
+      this.subscriptions[config.exchangeName][routingKey].push(onMessageCb);
     }
 
     this.conn.send(JSON.stringify(config));
   };
 
-  unsubscribe = (metric, params, onMessageCb) => {
+  unsubscribe = (params, onMessageCb) => {
     if (Object.prototype.toString.call(params) === '[object Function]') {
       onMessageCb = params;
     }
 
-    let deviceName = params.deviceName || this.deviceName;
+    let exchangeName = params.exchangeName || this.exchangeName;
+    let routingKey = params.routingKey || this.routingKey;
 
-    if (!metric) {
-      throw Error('Missing metric')
+    if (!exchangeName) {
+      throw Error('Missing exchange name')
     }
-    if (!deviceName) {
-      throw Error('Missing device parameters')
+    if (!routingKey) {
+      throw Error('Missing routing key')
     }
 
     const config = {
       type: 'unsubscription',
-      deviceName: deviceName,
-      metric: metric
+      exchangeName: exchangeName,
+      routingKey: routingKey
     };
 
-    if (this.subscriptions[config.deviceName][metric]) {
-      this.subscriptions[config.deviceName][metric].splice(
-        this.subscriptions[config.deviceName][metric].indexOf(onMessageCb), 1);
+    if (this.subscriptions[config.exchangeName][routingKey]) {
+      this.subscriptions[config.exchangeName][routingKey].splice(
+        this.subscriptions[config.exchangeName][routingKey].indexOf(onMessageCb), 1);
     }
 
     this.conn.send(JSON.stringify(config));
@@ -114,10 +117,10 @@ class CloudbrainWebsocketClient {
 
   _onmessage = (e) => {
     let jsonContent = JSON.parse(e.data);
-    let fromMetric = jsonContent.metric;
-    let fromDeviceName = jsonContent.device_name;
+    let fromExchangeName = jsonContent.exchangeName;
+    let fromRoutingKey = jsonContent.routingKey;
 
-    this.subscriptions[fromDeviceName][fromMetric].forEach((cb) => cb(jsonContent));
+    this.subscriptions[fromExchangeName][fromRoutingKey].forEach((cb) => cb(jsonContent));
   };
 
   _createNestedObject = function (base, names) {
@@ -171,24 +174,23 @@ function withStream(baseConfig) {
       let sub = {};
       while (this.pendingSubscriptions.length > 0) {
         sub = this.pendingSubscriptions.pop();
-        this.subscribe(sub.metric, sub.params, sub.cb);
+        this.subscribe(sub.params, sub.cb);
       }
     };
 
-    subscribe = (metric, params, cb) => {
+    subscribe = (params, cb) => {
       if (!this.state.stream.conn || this.state.stream.conn.readyState !== 1) {
         this.pendingSubscriptions.push({
-          metric: metric,
           params: params,
           cb: cb
         });
       } else {
-        this.state.stream.subscribe(metric, params, cb);
+        this.state.stream.subscribe(params, cb);
       }
     };
 
-    unsubscribe = (metric, params) => {
-      this.state.stream.unsubscribe(metric, params);
+    unsubscribe = (params) => {
+      this.state.stream.unsubscribe(params);
     };
 
     render() {

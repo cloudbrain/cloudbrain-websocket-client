@@ -60,11 +60,14 @@ describe('CloudbrainWebsocketClient', () => {
 
     describe('conn.onmessage', () => {
       let messageCallback = jasmine.createSpy('messageCallback');
-      let data = JSON.stringify({ device_name:  'openbci', metric: 'eeg' });
+      let data = JSON.stringify({
+        exchangeName:  'amq.topic',
+        routingKey: 'openbci:eeg'
+      });
       let message = { data: data };
 
       beforeEach(() => {
-        client.subscriptions = { openbci: { eeg: [messageCallback] } };
+        client.subscriptions = { 'amq.topic': { 'openbci:eeg': [messageCallback] } };
       });
 
       it('calls a callback when a message is received', () => {
@@ -95,18 +98,20 @@ describe('CloudbrainWebsocketClient', () => {
   describe('.subscribe', () => {
     let sendMessageSpy = {};
     let callback = () => {};
-    let metric = 'eeg';
-    let params = { deviceName: 'openbci' };
+    let params = {
+      exchangeName:  'amq.topic',
+      routingKey: 'openbci:eeg'
+    };
 
-    describe('with device parameters', () => {
+    describe('with parameters', () => {
       beforeEach(() => {
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
-        client.subscribe(metric, params, callback);
+        client.subscribe(params, callback);
       });
 
       it('stores the callback', () => {
-        expect(client.subscriptions).toEqual({ openbci: { eeg: [callback] } });
+        expect(client.subscriptions).toEqual({ 'amq.topic': { 'openbci:eeg': [callback] } });
       });
 
       it('sends configuration message', () => {
@@ -114,17 +119,20 @@ describe('CloudbrainWebsocketClient', () => {
       });
     });
 
-    describe('without device parameters', () => {
+    describe('without parameters', () => {
       beforeEach(() => {
-        client = new CloudbrainWebsocketClient({ host: host,
-                                           deviceName: params.deviceName });
+        client = new CloudbrainWebsocketClient({
+          host: host,
+          exchangeName: params.exchangeName,
+          routingKey: params.routingKey
+        });
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
-        client.subscribe(metric, callback);
+        client.subscribe(callback);
       });
 
       it('stores the callback', () => {
-        expect(client.subscriptions).toEqual({ openbci: { eeg: [callback] } });
+        expect(client.subscriptions).toEqual({ 'amq.topic': { 'openbci:eeg': [callback] } });
       });
 
       it('sends configuration message', () => {
@@ -132,14 +140,14 @@ describe('CloudbrainWebsocketClient', () => {
       });
     });
 
-    describe('when no device parameters are available', () => {
+    describe('when no parameters are available', () => {
       beforeEach(() => {
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
       });
 
       it('throws an error', () => {
-        expect(() => { client.subscribe(metric, callback) }).toThrowError('Missing device parameters');
+        expect(() => { client.subscribe(callback) }).toThrowError('Missing exchange name');
       });
 
       it('does not send a configuration message', () => {
@@ -152,19 +160,21 @@ describe('CloudbrainWebsocketClient', () => {
   describe('.unsubscribe', () => {
     let sendMessageSpy = {};
     let callback = () => {};
-    let metric = 'eeg';
-    let params = { deviceName: 'openbci' };
+    let params = {
+      exchangeName:  'amq.topic',
+      routingKey: 'openbci:eeg'
+    };
 
     describe('with device parameters', () => {
       beforeEach(() => {
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
-        client.subscribe(metric, params, callback);
-        client.unsubscribe(metric, params, callback);
+        client.subscribe(params, callback);
+        client.unsubscribe(params, callback);
       });
 
       it('removes the callback', () => {
-        expect(client.subscriptions).toEqual({ openbci: { eeg: [] } });
+        expect(client.subscriptions).toEqual({ 'amq.topic': { 'openbci:eeg': [] } });
       });
 
       it('sends configuration message', () => {
@@ -174,17 +184,20 @@ describe('CloudbrainWebsocketClient', () => {
 
     describe('without device parameters', () => {
       beforeEach(() => {
-        client = new CloudbrainWebsocketClient({ host: host,
-                                           deviceName: params.deviceName });
+        client = new CloudbrainWebsocketClient({
+          host: host,
+          exchangeName: params.exchangeName,
+          routingKey: params.routingKey
+        });
         client.connect();
         sendMessageSpy = spyOn(client.conn, 'send');
-        client.subscribe(metric, params, callback);
-        client.unsubscribe(metric, callback);
+        client.subscribe(params, callback);
+        client.unsubscribe(callback);
 
       });
 
       it('stores the callback', () => {
-        expect(client.subscriptions).toEqual({ openbci: { eeg: [] } });
+        expect(client.subscriptions).toEqual({ 'amq.topic': { 'openbci:eeg': [] } });
       });
 
       it('sends configuration message', () => {
@@ -198,7 +211,7 @@ describe('CloudbrainWebsocketClient', () => {
       let obj = {};
       const keys = ['one', 'two', 'three'];
       const expectedObj = { one: { two: { three: {} } } };
-      client._createNestedObject(obj, keys)
+      client._createNestedObject(obj, keys);
       expect(obj).toEqual(expectedObj);
     });
   });
