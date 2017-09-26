@@ -1,4 +1,6 @@
 import SockJS from 'sockjs-client';
+import React from 'react';
+
 
 class CloudbrainWebsocketClient {
   constructor(config) {
@@ -8,7 +10,9 @@ class CloudbrainWebsocketClient {
     this.conn = null;
     this.subscriptions = {};
 
-    if (!config.host) { throw Error('SockJS connection URL not specified'); }
+    if (!config.host) {
+      throw Error('SockJS connection URL not specified');
+    }
   }
 
   disconnect = () => {
@@ -53,8 +57,12 @@ class CloudbrainWebsocketClient {
     let downsamplingFactor = params.downsamplingFactor || 1;
     let token = params.token || this.token;
 
-    if(!metric) { throw Error('Missing metric') }
-    if(!deviceName) { throw Error('Missing device parameters') }
+    if (!metric) {
+      throw Error('Missing metric')
+    }
+    if (!deviceName) {
+      throw Error('Missing device parameters')
+    }
 
     const config = {
       type: 'subscription',
@@ -83,8 +91,12 @@ class CloudbrainWebsocketClient {
 
     let deviceName = params.deviceName || this.deviceName;
 
-    if(!metric) { throw Error('Missing metric') }
-    if(!deviceName) { throw Error('Missing device parameters') }
+    if (!metric) {
+      throw Error('Missing metric')
+    }
+    if (!deviceName) {
+      throw Error('Missing device parameters')
+    }
 
     const config = {
       type: 'unsubscription',
@@ -108,11 +120,91 @@ class CloudbrainWebsocketClient {
     this.subscriptions[fromDeviceName][fromMetric].forEach((cb) => cb(jsonContent));
   };
 
-  _createNestedObject = function( base, names ) {
-    for (var i = 0; i < names.length; i++ ) {
-      base = base[ names[i] ] = base[ names[i] ] || {};
+  _createNestedObject = function (base, names) {
+    for (var i = 0; i < names.length; i++) {
+      base = base[names[i]] = base[names[i]] || {};
     }
   };
 }
 
-export default CloudbrainWebsocketClient;
+
+function withStream(baseConfig) {
+  let instance = null;
+
+  return (BaseComponent) => class RealtimeComponent extends React.Component {
+    constructor() {
+      super();
+
+      const config = Object.assign({}, baseConfig, {token: null});
+
+      if (!instance) {
+        this.state = {
+          stream: new CloudbrainWebsocketClient(config)
+        };
+
+        this._connect(this._onOpen, this._onClose);
+
+        this.pendingSubscriptions = [];
+
+        instance = this;
+      }
+
+      return instance;
+    }
+
+    _connect = (onOpen, onClose) => {
+      if (this.state.stream.conn === null) {
+        this.state.stream.connect(onOpen, onClose);
+      }
+    };
+
+    _onOpen = () => {
+      console.log('Realtime Connection Open');
+      this._subscribePending();
+    };
+
+    _onClose = () => {
+      console.log('Realtime Connection Closed');
+    };
+
+    _subscribePending = () => {
+      let sub = {};
+      while (this.pendingSubscriptions.length > 0) {
+        sub = this.pendingSubscriptions.pop();
+        this.subscribe(sub.metric, sub.params, sub.cb);
+      }
+    };
+
+    subscribe = (metric, params, cb) => {
+      if (!this.state.stream.conn || this.state.stream.conn.readyState !== 1) {
+        this.pendingSubscriptions.push({
+          metric: metric,
+          params: params,
+          cb: cb
+        });
+      } else {
+        this.state.stream.subscribe(metric, params, cb);
+      }
+    };
+
+    unsubscribe = (metric, params) => {
+      this.state.stream.unsubscribe(metric, params);
+    };
+
+    render() {
+      return (
+        <BaseComponent
+          {...this.props}
+          stream={{
+            subscribe: this.subscribe,
+            unsubscribe: this.unsubscribe
+          }}
+        />);
+    }
+  };
+}
+
+export {
+  CloudbrainWebsocketClient,
+  withStream
+};

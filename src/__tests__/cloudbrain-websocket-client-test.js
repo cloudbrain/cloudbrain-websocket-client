@@ -1,4 +1,4 @@
-import CloudbrainWebsocketClient from '../cloudbrain-websocket-client';
+import { CloudbrainWebsocketClient } from '../cloudbrain-websocket-client';
 
 describe('CloudbrainWebsocketClient', () => {
 
