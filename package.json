@@ -1,7 +1,7 @@
 {
   "name": "cloudbrain-websocket-client",
   "description": "A client for connecting and subscribing to the Cloudbrain WebSocket Server",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "maintainers": [
     {
       "name": "Marion Le Borgne",
